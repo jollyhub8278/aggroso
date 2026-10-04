@@ -1,184 +1,158 @@
 # Expense Claim Policy Review Assistant
 
-A full-stack internal review tool that combines deterministic expense validation with AI-assisted policy interpretation.
-
-The application helps reviewers evaluate employee expense claims, identify policy issues, retrieve relevant policy evidence, and record reviewer decisions.
+A full-stack expense claim review tool that combines deterministic validation with AI-assisted policy interpretation.
 
 ## Live Demo
 
-**Frontend:**  
-https://frontend-njk5.vercel.app
-
-**Backend API:**  
-https://aggroso-api.onrender.com
-
-**API Documentation:**  
-https://aggroso-api.onrender.com/docs
-
-**GitHub Repository:**  
-https://github.com/jollyhub8278/aggroso
-
----
-
-## Overview
-
-The Expense Claim Policy Review Assistant is designed to support an internal expense-review workflow.
-
-A submitted expense claim is evaluated through two complementary layers:
-
-1. **Deterministic validation**
-   - Required fields
-   - Amount validation
-   - Future-date validation
-   - Missing receipt detection
-   - Duplicate claim detection
-   - Category spending limits
-
-2. **AI-assisted policy review**
-   - Expense category classification
-   - Relevant policy retrieval
-   - Compliance interpretation
-   - Missing information detection
-   - Policy evidence
-   - Confidence and uncertainty handling
-
-The reviewer can then approve, reject, request clarification, or override the AI classification with a reason.
-
----
+- **Frontend:** https://frontend-njk5.vercel.app
+- **Backend API:** https://aggroso-api.onrender.com
+- **API Docs:** https://aggroso-api.onrender.com/docs
 
 ## Features
 
-### Expense Claim Management
-
-- Create new expense claims
-- View all submitted claims
-- View individual claim details
-- Track claim amounts and currencies
-- Track receipt availability
-- View claim review status
-
-### Policy Review
-
-- Classify ambiguous expense descriptions
-- Retrieve relevant policy sections
-- Explain potential policy issues
-- Highlight missing information
-- Provide policy evidence
-- Show classification confidence
-- Clearly mark uncertain classifications
-
-### Deterministic Validation
-
-The system performs rule-based validation for:
-
-- Required claimant
-- Required category
-- Required description
-- Positive claim amount
-- Future claim dates
-- Missing receipts
-- Duplicate claims
-- Category spending limits
-
-### Reviewer Actions
-
-Reviewers can:
-
-- Approve a claim
-- Reject a claim
-- Request clarification
-- Override the AI classification
-- Provide a reason for an override
-- View review decision history
-
-### Dashboard
-
-The frontend dashboard provides:
-
-- Total claims
-- Total claim amount
-- Pending review
-- Approved claims
-- Claims needing attention
-- Rejected claims
-- Claim list with category, amount, receipt and AI status
-
----
+- Create and review expense claims
+- AI-assisted expense category classification
+- Policy retrieval and evidence
+- Compliance and clarification checks
+- Missing receipt and duplicate claim detection
+- Spending-limit and date validation
+- Approve, reject, or request clarification
+- Override AI classification with a reason
+- Review decision history
+- Dashboard with claim and review statistics
+- Local fallback when OpenAI API is unavailable
 
 ## Tech Stack
 
-### Frontend
-
-- React
-- Vite
-- JavaScript
-- CSS
-
-### Backend
-
-- Python
-- FastAPI
-- SQLAlchemy
-- Pydantic
-- SQLite
-
-### AI
-
-- OpenAI API (optional)
-- Local keyword-based classification fallback
-
-### Testing
-
-- Pytest
-- FastAPI TestClient
-
-### Deployment
-
-- Vercel — Frontend
-- Render — Backend
-
----
+- **Frontend:** React, Vite, JavaScript, CSS
+- **Backend:** FastAPI, SQLAlchemy, Pydantic
+- **Database:** SQLite
+- **AI:** OpenAI API + local fallback
+- **Testing:** Pytest
+- **Deployment:** Vercel + Render
 
 ## Project Structure
 
 ```text
 aggroso/
-│
 ├── backend/
-│   │
 │   ├── app/
 │   │   ├── routes/
-│   │   │   ├── claims.py
-│   │   │   └── reviews.py
-│   │   │
-│   │   ├── services/
-│   │   │   ├── ai_review.py
-│   │   │   ├── policy.py
-│   │   │   └── validation.py
-│   │   │
-│   │   ├── database.py
-│   │   ├── main.py
-│   │   ├── models.py
-│   │   └── schemas.py
-│   │
+│   │   └── services/
 │   ├── tests/
-│   │   └── test_claims.py
-│   │
 │   ├── seed.py
 │   ├── requirements.txt
-│   ├── runtime.txt
 │   └── .env.example
-│
 ├── frontend/
-│   │
 │   ├── src/
-│   │   ├── App.jsx
-│   │   ├── api.js
-│   │   ├── main.jsx
-│   │   └── styles.css
-│   │
-│   ├── package.json
-│   └── ...
-│
-├── .gitignore
+│   └── package.json
 └── README.md
+```
+
+## Run Locally
+
+### Backend
+
+```bash
+cd backend
+
+python -m venv venv
+```
+
+**Windows:**
+```bash
+venv\Scripts\activate
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Seed demo data:
+
+```bash
+python seed.py
+```
+
+Start the server:
+
+```bash
+uvicorn app.main:app --reload
+```
+
+Backend: `http://localhost:8000`  
+API Docs: `http://localhost:8000/docs`
+
+### Frontend
+
+Open a new terminal:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Frontend: `http://localhost:5173`
+
+## Optional OpenAI Configuration
+
+The application works without an OpenAI API key.
+
+To enable OpenAI-powered classification/review, create `backend/.env`:
+
+```env
+OPENAI_API_KEY=your_key_here
+```
+
+Without an API key, the application uses a lightweight local keyword-based classifier.
+
+## Demo Claims
+
+The seed script creates three example claims:
+
+- **Business Meals:** INR 12,500 — exceeds category limit
+- **Transportation:** INR 850 — missing receipt
+- **Travel:** INR 4,200 — compliant
+
+## API Endpoints
+
+```text
+GET  /claims
+GET  /claims/{claim_id}
+POST /claims
+POST /reviews/{claim_id}
+```
+
+Supported review actions:
+
+```text
+approve
+reject
+clarification
+override
+```
+
+## Testing
+
+Run:
+
+```bash
+cd backend
+python -m pytest -v
+```
+
+The test suite contains **21 tests** covering claim validation, duplicate detection, policy retrieval, AI review fields, reviewer actions, and review history.
+
+## Scope
+
+This project focuses on expense claim review and does not include:
+
+- Reimbursements
+- Payroll
+- Payment processing
+- Tax calculations
+- Receipt OCR
+- Accounting integrations
