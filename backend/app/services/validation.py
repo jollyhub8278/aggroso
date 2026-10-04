@@ -10,6 +10,7 @@ def find_duplicates(db: Session, claim: Claim):
         Claim.date == claim.date,
         Claim.amount == claim.amount,
         Claim.currency == claim.currency,
+        Claim.category == claim.category,
         Claim.description == claim.description,
     ).all()
 

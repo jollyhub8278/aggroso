@@ -41,6 +41,21 @@ def get_claim(claim_id: int, db: Session = Depends(get_db)):
 
 @router.post("", response_model=ClaimOut)
 def create_claim(data: ClaimCreate, db: Session = Depends(get_db)):
+    existing_claim = db.query(Claim).filter(
+        Claim.claimant == data.claimant,
+        Claim.date == data.date,
+        Claim.category == data.category,
+        Claim.amount == data.amount,
+        Claim.currency == data.currency,
+        Claim.description == data.description
+    ).first()
+
+    if existing_claim:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Duplicate claim detected. Matching claim #{existing_claim.id} already exists."
+        )
+
     claim = Claim(**data.model_dump())
     db.add(claim)
     db.commit()
@@ -51,15 +66,12 @@ def create_claim(data: ClaimCreate, db: Session = Depends(get_db)):
     claim.ai_confidence = result.get("confidence")
     claim.ai_status = result.get("status")
     claim.ai_reason = result.get("reason")
-    claim.missing_information = json.dumps(result.get("missing_information", []))
+    claim.missing_information = json.dumps(
+        result.get("missing_information", [])
+    )
+
     db.commit()
     db.refresh(claim)
+
     return claim
 
-
-@router.post("/{claim_id}/review")
-def add_review(claim_id: int, data, db: Session = Depends(get_db)):
-    claim = db.get(Claim, claim_id)
-    if not claim:
-        raise HTTPException(404, "Claim not found")
-    return {"message": "Use the /reviews endpoint"}

@@ -39,7 +39,7 @@ export async function createClaim(claim) {
 }
 
 export async function createReview(claimId, review) {
-  return request(`/claims/${claimId}/review`, {
+  return request(`/reviews/${claimId}`, {
     method: "POST",
     body: JSON.stringify(review)
   });
